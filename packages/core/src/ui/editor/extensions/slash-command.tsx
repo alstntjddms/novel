@@ -353,6 +353,16 @@ const CommandList = ({
       ref={commandListContainer}
       className="novel-z-50 novel-h-auto novel-max-h-[330px] novel-w-72 novel-overflow-y-auto novel-rounded-md novel-border novel-border-stone-200 novel-bg-white novel-px-1 novel-py-2 novel-shadow-md novel-transition-all"
     >
+      {/* 추가 시작  */}
+      <div className="flex px-14 my-8 text-gray-600 text-sm font-medium">
+        <div className="self-center overflow-hidden whitespace-nowrap">
+          기본 블록
+        </div>
+        <div className="ml-auto">
+          <div className="w-4 h-4 bg-gray-400 rounded-full"></div>
+        </div>
+      </div>
+      {/* 추가 끝  */}
       {items.map((item: CommandItemProps, index: number) => {
         return (
           <button

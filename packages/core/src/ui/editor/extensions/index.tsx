@@ -112,7 +112,7 @@ export const defaultExtensions = [
       if (node.type.name === "heading") {
         return `Heading ${node.attrs.level}`;
       }
-      return "'/'을 눌러서 메뉴를 확인해주세요...";
+      return "AI기능은 '++', 명령어는 '/' 입력";
     },
     includeChildren: true,
   }),
