@@ -1,9 +1,9 @@
 export default function Magic({ className }: { className: string }) {
   return (
     <svg
-      width="469"
-      // height="469"
-      viewBox="0 0 469 469"
+      // width="469"
+      // // height="469"
+      viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       shapeRendering="geometricPrecision"
