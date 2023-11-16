@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useEditor, EditorContent, JSONContent } from "@tiptap/react";
 import { defaultEditorProps } from "./props";
 import { defaultExtensions } from "./extensions";
@@ -16,6 +16,7 @@ import { ImageResizer } from "./extensions/image-resizer";
 import { EditorProps } from "@tiptap/pm/view";
 import { Editor as EditorClass, Extensions } from "@tiptap/core";
 import { NovelContext } from "./provider";
+import { ContextSummarize } from "./provider";
 
 export default function Editor({
   completionApi = "/api/generate",
@@ -142,6 +143,24 @@ export default function Editor({
       }
     },
   });
+  const { summarizeApi } = useContext(ContextSummarize);
+
+  const { complete:complete1, completion:completion1, isLoading:isLoading1, stop:stop1 } = useCompletion({
+    id: "novel1",
+    api: summarizeApi,
+    onFinish: (_prompt, completion) => {
+      editor?.commands.setTextSelection({
+        from: editor.state.selection.from - completion.length,
+        to: editor.state.selection.from,
+      });
+    },
+    onError: (err) => {
+      toast.error(err.message);
+      if (err.message === "You have reached your request limit for the day.") {
+        va.track("Rate Limit Reached");
+      }
+    },
+  });
 
   const prev = useRef("");
 
@@ -150,7 +169,14 @@ export default function Editor({
     const diff = completion.slice(prev.current.length);
     prev.current = completion;
     editor?.commands.insertContent(diff);
-  }, [isLoading, editor, completion]);
+  }, [isLoading, editor, completion ]);
+
+    // Insert chunks of the generated text
+    useEffect(() => {
+      const diff = completion1.slice(prev.current.length);
+      prev.current = completion1;
+      editor?.commands.insertContent(diff);
+    }, [ editor, isLoading1, completion1]);
 
   useEffect(() => {
     // if user presses escape or cmd + z and it's loading,
