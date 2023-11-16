@@ -25,6 +25,7 @@ import {
   Code,
   CheckSquare,
   Bot,
+  FilePieChart,
 } from "lucide-react";
 import { LoadingCircle } from "@/ui/icons";
 import { toast } from "sonner";
@@ -32,7 +33,7 @@ import va from "@vercel/analytics";
 import { Magic } from "@/ui/icons";
 import { getPrevText } from "@/lib/editor";
 import { startImageUpload } from "@/ui/editor/plugins/upload-images";
-import { NovelContext } from "../provider";
+import { ContextSummarize, NovelContext } from "../provider";
 
 interface CommandItemProps {
   title: string;
@@ -217,8 +218,13 @@ const getSuggestionItems = ({ query }: { query: string }) => {
       title: "AI로 계속해서 작성하기",
       description: "AI에게 작성하라고 지시하세요.",
       searchTerms: ["gpt"],
-      // icon: <Magic className="novel-w-7" />,
       icon: <Bot size={18} />,
+    },
+    {
+      title: "AI로 요약하기",
+      description: "AI에게 요약하라고 지시하세요.",
+      searchTerms: ["요약, 정리, summarize"],
+      icon: <FilePieChart size={18} />,
     },
   ].filter((item) => {
     if (typeof query === "string" && query.length > 0) {
@@ -262,11 +268,39 @@ const CommandList = ({
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const { completionApi } = useContext(NovelContext);
+  const { summarizeApi } = useContext(ContextSummarize);
 
-  const { complete, isLoading } = useCompletion({
+  const { complete: complete, isLoading: isLoading } = useCompletion({
     id: "novel",
     api: completionApi,
     onResponse: (response) => {
+      console.log("response");
+      console.log(response);
+      if (response.status === 429) {
+        toast.error("You have reached your request limit for the day.");
+        va.track("Rate Limit Reached");
+        return;
+      }
+      editor.chain().focus().deleteRange(range).run();
+    },
+    onFinish: (_prompt, completion) => {
+      // highlight the generated text
+      editor.commands.setTextSelection({
+        from: range.from,
+        to: range.from + completion.length,
+      });
+    },
+    onError: (e) => {
+      toast.error(e.message);
+    },
+  });
+
+  const { complete: complete1, isLoading: isLoading1 } = useCompletion({
+    id: "novel1",
+    api: summarizeApi,
+    onResponse: (response) => {
+      console.log("response");
+      console.log(response);
       if (response.status === 429) {
         toast.error("You have reached your request limit for the day.");
         va.track("Rate Limit Reached");
@@ -293,7 +327,37 @@ const CommandList = ({
         command: item.title,
       });
       if (item) {
-        if (item.title === "AI로 계속해서 작성하기") {
+        if (item.title === "AI로 요약하기") {
+          if (isLoading1) return;
+
+          // editor
+          //   .chain()
+          //   .focus()
+          //   // .deleteRange(range)
+          //   .insertContent({
+          //     type: "heading",
+          //     attrs: {
+          //       level: 3,
+          //     },
+          //     content: [
+          //       {
+          //         type: "text",
+          //         text: "[AI로 요약]",
+          //       },
+          //     ],
+          //   })
+          //   .insertContent({
+          //     type: "paragraph",
+          //   })
+          //   .run();
+
+          complete1(
+            getPrevText(editor, {
+              chars: 5000,
+              offset: 1,
+            })
+          );
+        } else if (item.title === "AI로 계속해서 작성하기") {
           if (isLoading) return;
           complete(
             getPrevText(editor, {
@@ -306,7 +370,7 @@ const CommandList = ({
         }
       }
     },
-    [complete, isLoading, command, editor, items]
+    [complete, complete1, isLoading, isLoading1, command, editor, items]
   );
 
   useEffect(() => {
@@ -378,6 +442,8 @@ const CommandList = ({
           >
             <div className="novel-flex novel-h-10 novel-w-10 novel-items-center novel-justify-center novel-rounded-md novel-border novel-border-stone-200 novel-bg-white">
               {item.title === "AI로 계속해서 작성하기" && isLoading ? (
+                <LoadingCircle />
+              ) : item.title === "AI로 요약하기" && isLoading1 ? (
                 <LoadingCircle />
               ) : (
                 item.icon

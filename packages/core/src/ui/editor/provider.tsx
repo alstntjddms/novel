@@ -7,3 +7,9 @@ export const NovelContext = createContext<{
 }>({
   completionApi: "/api/generate",
 });
+
+export const ContextSummarize = createContext<{
+  summarizeApi: string;
+}>({
+  summarizeApi: "/api/summarize",
+});
