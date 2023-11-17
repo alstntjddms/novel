@@ -103,15 +103,6 @@ const getSuggestionItems = ({ query }: { query: string }) => {
       },
     },
     {
-      title: "할 일 목록",
-      description: "할 일 목록으로 작업을 추적하세요.",
-      searchTerms: ["todo", "task", "list", "check", "checkbox"],
-      icon: <CheckSquare size={18} />,
-      command: ({ editor, range }: CommandProps) => {
-        editor.chain().focus().deleteRange(range).toggleTaskList().run();
-      },
-    },
-    {
       title: "제목1",
       description: "섹션 제목(대)",
       searchTerms: ["title", "big", "large"],
@@ -169,6 +160,15 @@ const getSuggestionItems = ({ query }: { query: string }) => {
       icon: <ListOrdered size={18} />,
       command: ({ editor, range }: CommandProps) => {
         editor.chain().focus().deleteRange(range).toggleOrderedList().run();
+      },
+    },
+    {
+      title: "할 일 목록",
+      description: "할 일 목록으로 작업을 추적하세요.",
+      searchTerms: ["todo", "task", "list", "check", "checkbox"],
+      icon: <CheckSquare size={18} />,
+      command: ({ editor, range }: CommandProps) => {
+        editor.chain().focus().deleteRange(range).toggleTaskList().run();
       },
     },
     {
