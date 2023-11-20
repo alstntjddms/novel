@@ -145,7 +145,12 @@ export default function Editor({
   });
   const { summarizeApi } = useContext(ContextSummarize);
 
-  const { complete:complete1, completion:completion1, isLoading:isLoading1, stop:stop1 } = useCompletion({
+  const {
+    complete: complete1,
+    completion: completion1,
+    isLoading: isLoading1,
+    stop: stop1,
+  } = useCompletion({
     id: "novel1",
     api: summarizeApi,
     onFinish: (_prompt, completion) => {
@@ -169,14 +174,14 @@ export default function Editor({
     const diff = completion.slice(prev.current.length);
     prev.current = completion;
     editor?.commands.insertContent(diff);
-  }, [isLoading, editor, completion ]);
+  }, [isLoading, editor, completion]);
 
-    // Insert chunks of the generated text
-    useEffect(() => {
-      const diff = completion1.slice(prev.current.length);
-      prev.current = completion1;
-      editor?.commands.insertContent(diff);
-    }, [ editor, isLoading1, completion1]);
+  // Insert chunks of the generated text
+  useEffect(() => {
+    const diff = completion1.slice(prev.current.length);
+    prev.current = completion1;
+    editor?.commands.insertContent(diff);
+  }, [editor, isLoading1, completion1]);
 
   useEffect(() => {
     // if user presses escape or cmd + z and it's loading,

@@ -16,6 +16,7 @@ import UploadImagesPlugin from "@/ui/editor/plugins/upload-images";
 import UpdatedImage from "./updated-image";
 import CustomKeymap from "./custom-keymap";
 import DragAndDrop from "./drag-and-drop";
+import TextAlign from "@tiptap/extension-text-align";
 
 export const defaultExtensions = [
   StarterKit.configure({
@@ -141,4 +142,7 @@ export const defaultExtensions = [
   }),
   CustomKeymap,
   DragAndDrop,
+  TextAlign.configure({
+    types: ["heading", "paragraph"],
+  }),
 ];
